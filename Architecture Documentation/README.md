@@ -1,78 +1,38 @@
 # OpenClaw MLS Assistant Architecture Flow
 
-Create a polished, presentation-ready architecture workflow diagram for the OpenClaw deliverable.
+User queries are routed from WhatsApp through OpenClaw skills and tools to retrieve MLS/property data, update memory, and return a response.
 
-The diagram should show how a user query flows through the system:
+```mermaid
+flowchart LR
+  classDef comm fill:#e8f7f0,stroke:#2fb47c,color:#12352a,stroke-width:2px
+  classDef runtime fill:#edf3ff,stroke:#4977d6,color:#17294f,stroke-width:2px
+  classDef skills fill:#fff4df,stroke:#e0a137,color:#4a3211,stroke-width:2px
+  classDef data fill:#f1edff,stroke:#7c63d9,color:#2d2454,stroke-width:2px
+  classDef response fill:#fff0f2,stroke:#cf5d70,color:#4b1d27,stroke-width:2px
 
-```text
-User -> WhatsApp Channel -> OpenClaw Runtime -> Orchestrator / Skill Selector -> Selected Skill -> Tool Execution -> External Data Source -> Memory Update -> Response back to User
-```
+  subgraph Communication["Communication Layer"]
+    User["User<br/><small>Starts the property query</small>"]:::comm
+    WhatsApp["WhatsApp Channel<br/><small>Receives user messages</small>"]:::comm
+  end
 
-## Caption
+  subgraph Runtime["OpenClaw Runtime Layer"]
+    OpenClaw["OpenClaw Runtime<br/><small>Hosts assistant workflow</small>"]:::runtime
+    Orchestrator["Orchestrator / Skill Selector<br/><small>Routes requests to the right skill</small>"]:::runtime
+  end
 
-User queries are routed from WhatsApp through OpenClaw skills and tools to retrieve MLS/property data, update memory, and return a contextual response to the user.
+  subgraph SkillsTools["Skills & Tools Layer"]
+    Skill["Selected Skill<br/><small>Property search, market stats, guidance</small>"]:::skills
+    Tools["Tool Execution<br/><small>Runs API and database functions</small>"]:::skills
+  end
 
-## Required Layers
+  subgraph Data["Data Layer"]
+    Source["MLS Database / Property API<br/><small>Returns listing and market data</small>"]:::data
+  end
 
-Group related components into clearly labeled visual layers:
+  subgraph MemoryResponse["Response/Memory Layer"]
+    Memory["Memory Update<br/><small>Stores session and long-term context</small>"]:::response
+    Response["Response back to User<br/><small>Sends final answer through WhatsApp</small>"]:::response
+  end
 
-- Communication Layer
-- OpenClaw Runtime Layer
-- Skills & Tools Layer
-- Data Layer
-- Response/Memory Layer
-
-## Required Components
-
-Include the following components in the workflow:
-
-- User
-  - Starts the property-related query or follow-up request.
-- WhatsApp Channel
-  - Receives user messages and sends responses back to the user.
-- OpenClaw Runtime
-  - Hosts the assistant workflow and coordinates runtime execution.
-- Orchestrator / Skill Selector
-  - Routes each request to the correct skill based on user intent.
-- Selected Skill
-  - Represents modular capability units such as property search, listing lookup, market stats, or buyer guidance.
-- Tool Execution
-  - Runs executable functions that query APIs, databases, or other external services.
-- External Data Source
-  - Includes systems such as an MLS Database, Property API, or market data service.
-- Memory Update
-  - Stores session context and long-term user/property context.
-- Response back to User
-  - Returns the final answer through WhatsApp.
-
-## Visual Requirements
-
-Generate the diagram as a standalone HTML file that can be opened directly in a browser and screenshot or exported for documentation.
-
-The HTML file should use clean CSS with SVG or Mermaid and should look more polished than a basic flowchart:
-
-- Modern colors
-- Rounded boxes
-- Clear directional arrows
-- Readable typography
-- Soft page background
-- Subtle shadows
-- Balanced spacing
-- Strong hierarchy
-- Clear section labels
-
-## Deliverable
-
-Create a standalone HTML diagram file for documentation use.
-
-Recommended filename:
-
-```text
-openclaw-mls-assistant-architecture-flow.html
-```
-
-The page must include the title:
-
-```text
-OpenClaw MLS Assistant Architecture Flow
+  User --> WhatsApp --> OpenClaw --> Orchestrator --> Skill --> Tools --> Source --> Memory --> Response --> WhatsApp
 ```
