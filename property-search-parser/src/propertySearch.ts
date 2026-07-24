@@ -1,3 +1,5 @@
+import type { PropertyFilter } from "./parsePropertyQuery";
+
 import {
   parsePropertyQuery,
   mapToDbFilters,
@@ -11,19 +13,19 @@ import {
   formatSoldComps,
 } from "./propertycards";
 
-export async function handlePropertySearch(
-  userQuery: string
+/**
+ * Runs a property search from an already-parsed set of filters.
+ *
+ * This is useful for multi-turn conversations because the filters can come
+ * from the saved user session instead of only from the latest message.
+ */
+export async function handleParsedPropertySearch(
+  parsed: PropertyFilter
 ): Promise<string> {
-  if (!userQuery.trim()) {
-    return "Please enter a property search request.";
-  }
-
   try {
-    const parsed = await parsePropertyQuery(userQuery);
     const dbFilters = mapToDbFilters(parsed);
 
-    console.log("User query:", userQuery);
-    console.log("Parsed:", parsed);
+    console.log("Parsed filters:", parsed);
     console.log("DB filters:", dbFilters);
 
     if (parsed.intent === "sold") {
@@ -46,10 +48,35 @@ export async function handlePropertySearch(
       10
     );
 
+    if (listings.length === 0) {
+      return [
+        "I could not find any active listings that match those preferences.",
+        "Try increasing the budget, reducing the bedroom requirement,",
+        "or changing the property type.",
+      ].join(" ");
+    }
+
     return formatActiveListings(listings);
   } catch (error) {
     console.error("Property search failed:", error);
 
     return "I could not complete the property search because of a processing or database error.";
   }
+}
+
+/**
+ * Preserves the original single-turn behavior.
+ */
+export async function handlePropertySearch(
+  userQuery: string
+): Promise<string> {
+  if (!userQuery.trim()) {
+    return "Please enter a property search request.";
+  }
+
+  const parsed = await parsePropertyQuery(userQuery);
+
+  console.log("User query:", userQuery);
+
+  return handleParsedPropertySearch(parsed);
 }
